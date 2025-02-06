@@ -3,40 +3,27 @@ import OpenAI from "openai";
 import { ChatCompletion } from "openai/resources/index.mjs";
 // import { responseX } from '../data/x_response'
 import { responseX } from '../data/x_response_celec';
-import fs from "fs";
+import fs, { stat } from "fs";
 import { generatePDF } from "../utils/generatePDF";
 import puppeteer from "puppeteer";
+import dotenv from "dotenv";
+import { ResponseX } from "../models";
+import { RequestTweets } from "../dto";
+import { generateQueryGetTweets } from "../utils";
+
+dotenv.config();
 
 
-const BEARER_TOKEN_TWITTER = "";
-const BEARER_TOKEN_OPENAI = "";
+const BEARER_TOKEN_TWITTER = process.env.BEARER_TOKEN_TWITTER || "";
+const BEARER_TOKEN_OPENAI = process.env.BEARER_TOKEN_OPENAI || "";
 
-const BASE_URL_TWITTER = "https://api.twitter.com/2";
-// from:Cnel_EP inversiones proyectos inversion monto responsable mantenimiento
-const BASE_URL_OPENAI = "";
-
-
-// X - INTERFACES
-interface Tweet{
-    id: string,
-    edit_history_tweet_ids: string[],
-    text: string
-}
-
-interface Meta{
-    newest_id: string,
-    oldest_id: string,
-    result_count: number
-}
-
-interface ResponseX {
-    data: Tweet[],
-    meta: Meta
-}
-
-// OBTENER POST DE TWITTER
-export const getPost = async ( req: Request, res: Response) => {
-    const query = req.query.query as string;
+const BASE_URL_TWITTER = process.env.BASE_URL_TWITTER || "";
+// tweets
+export const tweetsForInsight = async ( req: Request, res: Response) => {
+    const { cuentas, keywords, start_date, end_date } = req.body as RequestTweets;
+    
+    let query = generateQueryGetTweets( cuentas, keywords );
+    console.log( query );
     let response: ResponseX = {
         data : [],
         meta: {
@@ -45,18 +32,23 @@ export const getPost = async ( req: Request, res: Response) => {
             result_count: 0
         }
     };
-    if( !query ){
+    if( !cuentas || !keywords || !start_date || !end_date ){
         res.status( 400 ).json({
-            msg: "Debe enviar al menos un query"
-        })
+            msg: "Faltan parametros para la ejecución de la consulta"
+        });
     }
 
-    if( query !== undefined && query.trim().length === 0){
+    if(
+        cuentas.length === 0 ||
+        keywords.length === 0 ||
+        start_date.trim().length === 0 ||
+        end_date.trim().length === 0
+    ){
         res.status( 400 ).json({
-            msg: "Debe enviar al menos un query"
+            msg: "Faltan parametros para la ejecución de la consulta"
         })
     }
-
+    
     await fetch(
         `${ BASE_URL_TWITTER}/tweets/search/recent?query=${ query.trim() }`,
         {
@@ -80,8 +72,7 @@ export const getPost = async ( req: Request, res: Response) => {
 }
 
 // GENERAR INSIGHTS
-export const getInsights = async( req: Request, res: Response ) => {
-    
+export const insightsByTweets = async( req: Request, res: Response ) => {
     // const query = req.query.query as string;
 
     // if( !query ){
@@ -107,7 +98,11 @@ export const getInsights = async( req: Request, res: Response ) => {
             messages: [
               {
                 "role": "user",
-                "content": "Eres un asistente que crea informes detallados en HTML.",
+                "content": "Eres un asistente que crea informes detallados en formato JSON.",
+              },
+              {
+                "role": "user",
+                "content": "La respuesta debe tener el siguiente formato"
               },
               {
                 "role": "user",
@@ -143,7 +138,7 @@ export const getInsights = async( req: Request, res: Response ) => {
         // res.send(pdfBuffer);
         fs.writeFileSync("informe.html", newSummary, "utf8"); // Guardar el HTML
         await generatePDF(newSummary); // Convertir a PDF
-        console.log("✅ Informe generado con éxito: informe.pdf");
+        console.log("Informe generado con éxito: informe.pdf");
         res.status( 200 ).json({
             choices
         });
@@ -151,4 +146,22 @@ export const getInsights = async( req: Request, res: Response ) => {
         console.error("Error al generar el PDF:", error);
         res.status(500).json({ error: "Error interno al generar el PDF" });
     }
+}
+
+export const newTweetsForInsight = async ( req: Request, res: Response) => {
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
+
+    const username = "elonmusk";
+    await page.goto(`https://x.com/${username}`, { waitUntil: "networkidle2" });
+
+    const tweets = await page.evaluate(() => {
+        return Array.from( document.querySelectorAll("article") ).map( tweet => tweet.innerText );
+    });
+
+    console.log(tweets);
+
+    await browser.close();
+
+    res.json({ msg: 'respuesta' })
 }

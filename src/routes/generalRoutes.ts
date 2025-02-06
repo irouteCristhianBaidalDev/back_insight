@@ -1,9 +1,11 @@
 import { Router } from "express";
-import { getInsights, getPost } from "../controller/generalController";
+import { insightsByTweets, newTweetsForInsight, tweetsForInsight } from "../controller/generalController";
 const routes = Router();
 // x.com
-routes.get( '/x/getPosts',  getPost);
+routes.post( '/x/tweets',  tweetsForInsight);
 // OPEN AI
-routes.post('/openai/getInsights', getInsights);
+routes.post('/openai/insights', insightsByTweets);
+// ALTERNATIVA A X
+routes.post('/x/tweets/v2', newTweetsForInsight );
 
 export default routes;
