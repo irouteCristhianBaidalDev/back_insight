@@ -155,14 +155,20 @@ export const insightsByTweets = async( req: Request, res: Response ) => {
         
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
-        await page.setContent(summaryHTML);
-        const pdfBuffer = await page.pdf({ format: "A4" });
+        
+        await page.setContent(summaryHTML, { waitUntil: 'networkidle0' });
+        const pdfBuffer = await page.pdf({
+            format: "A4",
+            printBackground: true
+        });
         await browser.close();
     
+        res.setHeader("Content-Type", "application/octet-stream");
         // Enviar el PDF como respuesta
         res.set({
             "Content-Type": "application/pdf",
             "Content-Disposition": "attachment; filename=informe.pdf",
+            "Content-Length": pdfBuffer.length
         });
       
         res.send(pdfBuffer);
