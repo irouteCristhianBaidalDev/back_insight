@@ -13,13 +13,13 @@ export const responseX = [
         ],
         "text": "RT @RecNaturalesEC: 📍¡BUENAS NOTICIAS!\n🔹GUAYAQUIL | La ministra @inesmanzano, junto al gerente de @CNEL_EP, Ángel Erazo; recorrieron las zo…"
     },
-    // {
-    //     "id": "1885080240827097452",
-    //     "edit_history_tweet_ids": [
-    //         "1885080240827097452"
-    //     ],
-    //     "text": "El monto de inversión en esta etapa, por parte de CELEC EP, es de 700 mil dólares, beneficiando a 6 mil personas. Se colocarán tres pulgadas de carpeta asfáltica y obras complementarias."
-    // },
+    {
+        "id": "18850802408270945454",
+        "edit_history_tweet_ids": [
+            "18850802408270945454"
+        ],
+        "text": "El monto de inversión en esta etapa, por parte de CELEC EP, es de 700 mil dólares, beneficiando a 6 mil personas. Se colocarán tres pulgadas de carpeta asfáltica y obras complementarias."
+    },
     {
         "id": "1885080240827097452",
         "edit_history_tweet_ids": [

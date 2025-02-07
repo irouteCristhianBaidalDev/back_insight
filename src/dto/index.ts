@@ -1,1 +1,1 @@
-export * from './request.xapi'
+export * from './request.tweet.xapi'
