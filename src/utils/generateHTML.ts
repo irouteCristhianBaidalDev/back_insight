@@ -24,7 +24,7 @@ export const generateInformeHTML = ( proyectos: Proyecto[]): string => {
             <div class="responsables">
                 <h4>Responsables:</h4>
                 <ul>
-                    ${ responsables.map( r => '<li>'+ r +'</li>')}
+                    ${ responsables.map( r => '<li>'+ r +'</li>').join("")}
                 </ul>
             </div>
 
