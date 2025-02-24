@@ -7,7 +7,7 @@ export const configModelOpenAIGenerateInsigths: ChatCompletionMessageParam[] = [
     },
     {
         "role": "user",
-        "content": "La información que vas a tomar en cuenta son oportunidades de inversión, por ejemplo, un nuevo proyecto a implementar por la Empresa Eléctrica del Ecuador.",
+        "content": "La información que vas a tomar en cuenta son oportunidades de inversión donde incluya el monto, responsables, descripción del proyecto, por ejemplo, un nuevo proyecto a implementar por la Empresa Eléctrica del Ecuador.",
     },
     // {
     //     "role": "user",
